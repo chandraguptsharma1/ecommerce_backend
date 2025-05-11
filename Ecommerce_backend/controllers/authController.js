@@ -43,6 +43,3 @@ exports.register = async (req,res)=>{
 
 }
 
-export.login = async(req,res)=>{
-
-}
