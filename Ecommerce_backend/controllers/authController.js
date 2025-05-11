@@ -8,15 +8,35 @@ exports.register = async (req,res)=>{
     try{
 
         let user = await User.findOne({email});
-        if(user) return res.status(400).json({msg:'User already exits'});
+        if(user){
+            return res.status(400).json({
+                status:400,
+                msg:'User already exits',
+                data:null
+            });
+        } 
 
         const hashedPassword = await bcryt.hash(password,10);
         user = new User({name,email,password:hashedPassword})
         await user.save();
 
-        const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'1h'});
-        res.json({token});
+       return res.status(201).json({
+        status:201,
+        message:'User reqistered successfully',
+        data:{
+            user:{
+                id:user._id,
+                name:user.name,
+                email:user.email
+            }
+        }
+
+       })
     }catch(err){
-        res.status(500).send('Server Error')
+       return res.status(500).json({
+        status:500,
+        message:'Server error',
+        data:null
+       })
     }
 }
