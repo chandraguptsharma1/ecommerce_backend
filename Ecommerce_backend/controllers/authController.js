@@ -7,8 +7,8 @@ exports.register = async (req,res)=>{
     const {name, email,password}= req.body;
     try{
 
-        let user = await User.findOne({email});
-        if(user){
+        let register = await User.findOne({email});
+        if(register){
             return res.status(400).json({
                 status:400,
                 msg:'User already exits',
@@ -17,17 +17,17 @@ exports.register = async (req,res)=>{
         } 
 
         const hashedPassword = await bcryt.hash(password,10);
-        user = new User({name,email,password:hashedPassword})
-        await user.save();
+        const newUser  = new User({name,email,password:hashedPassword})
+        await newUser .save();
 
        return res.status(201).json({
         status:201,
         message:'User reqistered successfully',
         data:{
             user:{
-                id:user._id,
-                name:user.name,
-                email:user.email
+                id:newUser ._id,
+                name:newUser .name,
+                email:newUser .email
             }
         }
 
@@ -39,4 +39,10 @@ exports.register = async (req,res)=>{
         data:null
        })
     }
+
+
+}
+
+export.login = async(req,res)=>{
+
 }
