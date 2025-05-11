@@ -43,3 +43,52 @@ exports.register = async (req,res)=>{
 
 }
 
+exports.login = async(req,res)=>{
+    const {email,password} = req.body();
+
+    try{
+        let user = await User.findOne({email});
+
+        if(!user){
+            return res.status(400).json({
+                status:400,
+                message:'Invalid credentials: User not found',
+                data:null
+            })
+        }
+
+        const isMatch = await bcryt.compare(password,user.password);
+
+        if(!isMatch){
+            return res.status(400).json({
+                status:400,
+                message:'Invalid credentials: incorrect password',
+                data:null
+            }) 
+        }
+
+        const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{
+            expiresIn : '1h'
+        });
+
+        return res.status(200).json({
+            status:200,
+            message:'Login successful',
+            data:{
+                token,
+                user: {
+                  id: user._id,
+                  name: user.name,
+                  email: user.email
+                }
+            }
+        })
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({
+          status: 500,
+          message: 'Server error',
+          data: null
+        });
+    }
+}
